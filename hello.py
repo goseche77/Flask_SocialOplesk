@@ -93,10 +93,23 @@ def create_student():
             'data': new_student.to_dict()      
         })
 
-# #Ruta para borrar todos los estudiantes
-# @app.route('/delete-students', methods=["DELETE"])
-# def delete_all_students():
-#     students.clear()
-#     return jsonify({'message': 'Estudiantes borrados correctamente'})
+#Ruta para borrar todos los estudiantes
+@app.route('/delete-students', methods=["DELETE"])
+def delete_all_students():
+    db.session.query(Student).delete()
+    db.session.commit()
+    return jsonify({'message': 'Estudiantes borrados correctamente'})
+
+@app.route('/patch-student/<int:student_id>', methods=["PATCH"])
+def update_one_student(student_id):
+    data = request.json
+    student = Student.query.get(student_id)
+    if student:
+        for key, value in data.items():
+            setattr(student, key, value)
+        db.session.commit();
+        return jsonify({'message' : 'Estudiante actualizado parcialmente', 'data': student.to_dict()})
+    return jsonify({'message': 'El estudiante no ha sido encontrado'})
+
 
 
